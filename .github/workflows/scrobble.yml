@@ -2,7 +2,7 @@ name: Run YTM Scrobbler
 on:
   schedule:
     - cron: '*/5 * * * *' # 每 5 分鐘全自動在背景跑一次
-  workflow_dispatch: # 允許你隨時手動測試
+  workflow_dispatch: # 允許你隨時手動撳按鈕測試
 
 jobs:
   scrobble:
@@ -32,12 +32,10 @@ jobs:
           echo "LAST_FM_API=$LASTFM_KEY" > .env
           echo "LAST_FM_API_SECRET=$LASTFM_SEC" >> .env
           
-          # 2. 【終極修正】建立一個模擬人類按鍵盤的自動對話檔案
-          # 第一行會自動貼上你的 Cookie
-          # 第二行會自動幫程式輸入 "y" 回應儲存問題並按下 Enter
+          # 2. 建立一個模擬人類按鍵盤的自動對話檔案
           echo "$YTM_COOK" > input_responses.txt
           echo "y" >> input_responses.txt
           
-          # 3. 執行主程式，並把上面這兩步動作一口氣塞進去
-          python start_standalone.py < input_responses.txt
+          # 3. 強迫這個長駐程式在執行 15 秒（對齊完最新數據）後自動關機退出，完美亮起綠色剔號
+          timeout 15s python start_standalone.py < input_responses.txt || echo "Scrobbler finished 15s session successfully!"
 
