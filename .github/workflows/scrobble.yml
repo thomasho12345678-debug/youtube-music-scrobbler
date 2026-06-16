@@ -1,7 +1,7 @@
 name: Run YTM Scrobbler
 on:
   schedule:
-    - cron: '*/5 * * * *' # 改為每 5 分鐘全自動在背景跑一次
+    - cron: '*/5 * * * *' # 每 5 分鐘全自動在背景跑一次
   workflow_dispatch: # 允許你隨時手動測試
 
 jobs:
@@ -28,11 +28,16 @@ jobs:
           YTM_COOK: ${{ secrets.YTM_COOKIE }}
           FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
         run: |
-          # 1. 同時建立原作者程式需要讀取的環境變數配置文件
+          # 1. 建立原作者程式需要讀取的環境變數配置文件
           echo "LAST_FM_API=$LASTFM_KEY" > .env
           echo "LAST_FM_API_SECRET=$LASTFM_SEC" >> .env
           
-          # 2. 【核心修正】用 echo 強行把 Cookie 管道傳輸給 Python 的 input()
-          # 這樣程式一問「請輸入 Cookie」，雲端系統就會一秒幫牠自動貼上並按 Enter
-          echo "$YTM_COOK" | python start_standalone.py
+          # 2. 【終極修正】建立一個模擬人類按鍵盤的自動對話檔案
+          # 第一行會自動貼上你的 Cookie
+          # 第二行會自動幫程式輸入 "y" 回應儲存問題並按下 Enter
+          echo "$YTM_COOK" > input_responses.txt
+          echo "y" >> input_responses.txt
+          
+          # 3. 執行主程式，並把上面這兩步動作一口氣塞進去
+          python start_standalone.py < input_responses.txt
 
