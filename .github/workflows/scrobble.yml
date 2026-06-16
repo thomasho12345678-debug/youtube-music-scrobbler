@@ -18,11 +18,12 @@ jobs:
 
       - name: Install dependencies
         run: |
+          # 先幫原作者強制補上漏掉的 requests 套件，再安裝原本的清單
+          pip install requests
           pip install -r requirements.txt
 
       - name: Run Standalone Scrobbler
         env:
-          # 將你的密鑰先暫存進系統環境變數
           LASTFM_KEY: ${{ secrets.LASTFM_API_KEY }}
           LASTFM_SEC: ${{ secrets.LASTFM_SECRET }}
           YTM_COOK: ${{ secrets.YTM_COOKIE }}
@@ -36,3 +37,4 @@ jobs:
           
           # 3. 執行主程式
           python start_standalone.py
+
