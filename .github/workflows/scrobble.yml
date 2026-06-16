@@ -22,12 +22,17 @@ jobs:
 
       - name: Run Standalone Scrobbler
         env:
-          # 這裡必須完美對應原作者程式內定死的名字
-          LAST_FM_API: ${{ secrets.LASTFM_API_KEY }}
-          LAST_FM_API_SECRET: ${{ secrets.LASTFM_SECRET }}
+          # 將你的密鑰先暫存進系統環境變數
+          LASTFM_KEY: ${{ secrets.LASTFM_API_KEY }}
+          LASTFM_SEC: ${{ secrets.LASTFM_SECRET }}
+          YTM_COOK: ${{ secrets.YTM_COOKIE }}
         run: |
-          # 這裡把你在密鑰填的 Cookie 寫入實體檔案供程式讀取
-          echo "${{ secrets.YTM_COOKIE }}" > cookie.txt
+          # 1. 建立原作者程式指定需要的 cookie.txt
+          echo "$YTM_COOK" > cookie.txt
           
-          # 執行原作者的主程式
+          # 2. 同時建立原作者程式可能讀取的 .env 配置文件
+          echo "LAST_FM_API=$LASTFM_KEY" > .env
+          echo "LAST_FM_API_SECRET=$LASTFM_SEC" >> .env
+          
+          # 3. 執行主程式
           python start_standalone.py
