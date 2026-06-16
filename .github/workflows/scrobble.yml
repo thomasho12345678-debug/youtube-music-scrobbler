@@ -1,0 +1,29 @@
+name: Run YTM Scrobbler
+on:
+  schedule:
+    - cron: '*/15 * * * *' # 每 15 分鐘全自動在背景跑一次
+  workflow_dispatch: # 允許你隨時手動撳按鈕測試
+
+jobs:
+  scrobble:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run Standalone Scrobbler
+        env:
+          LAST_FM_API: ${{ secrets.LASTFM_API_KEY }}
+          LAST_FM_API_SECRET: ${{ secrets.LASTFM_SECRET }}
+        run: |
+          # 這裡把你在密鑰填的 Cookie 塞給執行檔
+          echo "${{ secrets.YTM_COOKIE }}" | python start_standalone.py
